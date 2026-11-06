@@ -1,0 +1,7 @@
+{
+  "name": "cache-meter",
+  "version": "1.0.0",
+  "description": "Leiste über dem Prompt: Cache-Restzeit, Hit-Rate, Kontext-Wetter und Compact-Button",
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

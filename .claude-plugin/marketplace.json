@@ -1,0 +1,11 @@
+{
+  "name": "lokale-mods",
+  "owner": { "name": "ragx" },
+  "plugins": [
+    {
+      "name": "cache-meter",
+      "source": "./cache-meter",
+      "description": "Leiste über dem Prompt: Cache-Restzeit, Hit-Rate, Kontext-Wetter und Compact-Button"
+    }
+  ]
+}
