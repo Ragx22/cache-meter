@@ -15,7 +15,7 @@ export function cacheView(
   now: number,
 ): CacheView {
   if (cacheAt === null) {
-    return { label: '–', filled: 0, color: undefined }
+    return { label: 'leer', filled: 0, color: 'error' }
   }
 
   const left = cacheAt + ttlMs - now
@@ -51,6 +51,23 @@ export const SKY_EMOJI: Record<Sky, string> = {
 
 export function groupDigits(n: number): string {
   return String(Math.round(n)).replace(/\B(?=(\d{3})+$)/g, '.')
+}
+
+/** The first log row after a compaction: what it saved, then the counts behind it. */
+export function compactLine(
+  before: number | undefined,
+  after: number | undefined,
+): string {
+  if (before === undefined || after === undefined) return 'Komprimierte Sitzung'
+
+  const saved = before - after
+  const counts = `(${groupDigits(before)} → ${groupDigits(after)})`
+
+  if (saved <= 0) return `Komprimierte Sitzung · keine Token gespart ${counts}`
+
+  const amount = saved < 1000 ? String(saved) : `${(saved / 1000).toFixed(1)}k`
+
+  return `Komprimierte Sitzung · ${amount} Token gespart ${counts}`
 }
 
 /** Cuts a piece too long for one line, at a line end or a space if it has one. */

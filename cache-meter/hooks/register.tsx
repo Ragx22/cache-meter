@@ -12,7 +12,7 @@ import {
   CELLS,
   SKY_EMOJI,
   cacheView,
-  groupDigits,
+  compactLine,
   logRows,
   pickSummary,
   skyOf,
@@ -134,10 +134,8 @@ async function afterCompact(
 
   if (!isShown) return
 
-  const say = (n: number | undefined) => (n === undefined ? '?' : groupDigits(n))
-
   const rows = [
-    `Compact: ${say(result.tokensBefore)} Tokens vorher → ${say(after)} nachher`,
+    compactLine(result.tokensBefore, after),
     ...logRows(pickSummary(result.messages) ?? ''),
   ]
 
@@ -312,6 +310,8 @@ export const register: Register = on => {
 
       let result
 
+      $.ui.toast('Sitzung wird komprimiert')
+
       try {
         result = await $.session.compact()
       } catch {
@@ -356,8 +356,11 @@ export const register: Register = on => {
     return stacked(
       <Box flexDirection="row">
         <Text wrap="truncate">
+          <Text color={view.color}>● </Text>
           <Text dimColor>cache </Text>
-          <Text color={view.color}>{view.label} </Text>
+          <Text color={view.color} bold={view.filled === 0}>
+            {view.label}{' '}
+          </Text>
           {view.filled > 0 ? (
             <Text color={view.color}>{'■'.repeat(view.filled)}</Text>
           ) : null}

@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-import { cacheView, logRows, pickSummary, skyOf } from './view'
+import { cacheView, compactLine, logRows, pickSummary, skyOf } from './view'
 
 const HOUR = 3_600_000
 
@@ -53,6 +53,33 @@ test('Farben: grün, im letzten Viertel gelb, in den letzten 10 % rot', () => {
 test('bei 0 steht abgelaufen, leere Leiste', () => {
   expect(cacheView(0, HOUR, HOUR).label).toBe('abgelaufen')
   expect(cacheView(0, HOUR, HOUR).filled).toBe(0)
+})
+
+test('ohne Cache steht leer in Rot', async ($, on) => {
+  expect(cacheView(null, HOUR, 0)).toEqual({ label: 'leer', filled: 0, color: 'error' })
+
+  mock.clock(on, { now: 0 })
+  seed(on, { meter: { ...METER, cacheAt: null, hit: null, percent: 0 } })
+
+  const ui = await $.ui.mount(BAND as any)
+  const text = await textOf(ui)
+
+  expect(text).toContain('● cache leer')
+  expect(text).toContain('– hit')
+  await ui.unmount()
+})
+
+test('nach dem Compact steht da, wie viel gespart wurde', () => {
+  expect(compactLine(90_000, 12_900)).toBe(
+    'Komprimierte Sitzung · 77.1k Token gespart (90.000 → 12.900)',
+  )
+  expect(compactLine(900, 400)).toBe(
+    'Komprimierte Sitzung · 500 Token gespart (900 → 400)',
+  )
+  expect(compactLine(400, 400)).toBe(
+    'Komprimierte Sitzung · keine Token gespart (400 → 400)',
+  )
+  expect(compactLine(undefined, 400)).toBe('Komprimierte Sitzung')
 })
 
 test('Wetter folgt der Auto-Compact-Schwelle', () => {
